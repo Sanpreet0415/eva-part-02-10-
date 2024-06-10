@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Center Events</title>
+    <style>
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .event, .register {
+            margin-bottom: 20px;
+        }
+        .details {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .details li {
+            background: #f4f4f4;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Community Center Events</h1>
+        <div class="event">
+            <h2>Create Event</h2>
+            <input type="text" id="eventName" placeholder="Event Name">
+            <input type="date" id="eventDate">
+            <input type="time" id="eventTime">
+            <button id="createEventButton">Create Event</button>
+            <div class="details" id="eventDetails">
+                <h3>Event Details:</h3>
+                <ul id="eventList"></ul>
+            </div>
+        </div>
+        <div class="register">
+            <h2>Register for Event</h2>
+            <input type="text" id="registerEventName" placeholder="Event Name">
+            <input type="text" id="registerParticipantName" placeholder="Participant Name">
+            <button id="registerForEventButton">Register</button>
+        </div>
+    </div>
+    <script>
+
+        function Event(eventName, date, time) {
+            this.eventName = eventName;
+            this.date = date;
+            this.time = time;
+            this.participants = [];
+        }
+
+
+        Event.prototype.addParticipant = function(participant) {
+            if (!this.participants.includes(participant)) {
+                this.participants.push(participant);
+                console.log(`Participant ${participant.name} added to event ${this.eventName}.`);
+            } else {
+                console.log("Participant already registered for this event.");
+            }
+        };
+
+        Event.prototype.updateDetails = function(eventName, date, time) {
+            this.eventName = eventName;
+            this.date = date;
+            this.time = time;
+        };
+
+        function Participant(name, contactInfo) {
+            this.name = name;
+            this.contactInfo = contactInfo;
+        }
+
+        // Participant Prototype Methods
+        Participant.prototype.registerForEvent = function(event) {
+            event.addParticipant(this);
+            alert(`You have registered for ${event.eventName} scheduled on ${event.time}`);
+        };
+
+        Participant.prototype.deregisterFromEvent = function(event) {
+            const index = event.participants.indexOf(this);
+            if (index !== -1) {
+                event.participants.splice(index, 1);
+                console.log("Deregistration successful.");
+            } else {
+                console.log("Participant is not registered for this event.");
+            }
+        };
+        const events = [];
+        const participants = [];
+
+        function createEvent() {
+            const eventName = document.getElementById('eventName').value;
+            const eventDate = document.getElementById('eventDate').value;
+            const eventTime = document.getElementById('eventTime').value;
+
+            if (!eventName || !eventDate || !eventTime) {
+                alert('Please fill all event details.');
+                return;
+            }
+
+            const event = new Event(eventName, eventDate, eventTime);
+            events.push(event);
+            console.log(`Event created: ${eventName}`);
+
+            updateEventList();
+        }
+
+        function registerForEvent() {
+            const registerEventName = document.getElementById('registerEventName').value;
+            const registerParticipantName = document.getElementById('registerParticipantName').value;
+
+            const event = events.find(event => event.eventName === registerEventName);
+            const participant = participants.find(participant => participant.name === registerParticipantName);
+
+            if (event && participant) {
+                participant.registerForEvent.apply(participant, [event]);
+            } else {
+                if (!event) {
+                    console.log(`Event ${registerEventName} not found.`);
+                }
+                if (!participant) {
+                    console.log(`Participant ${registerParticipantName} not found.`);
+                }
+                alert('Event or Participant not found.');
+            }
+        }
+
+        function updateEventList() {
+            const eventList = document.getElementById('eventList');
+            eventList.innerHTML = '';
+            events.forEach(event => {
+                const li = document.createElement('li');
+                li.textContent = `${event.eventName} - ${event.date} at ${event.time}`;
+                eventList.appendChild(li);
+            });
+        }
+
+        document.getElementById('createEventButton').addEventListener('click', createEvent);
+        document.getElementById('registerForEventButton').addEventListener('click', registerForEvent);
+    </script>
+</body>
+</html>
